@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="System.IO.DirectoryInfoEx">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <Members>
+      <Field Name="_cachedDirList" Hidden="true" />
+      <Field Name="_cachedFileList" Hidden="true" />
+      <Field Name="_dirType" Hidden="true" />
+      <Method Name="~DirectoryInfoEx" Hidden="true" />
+      <Method Name="checkExists" Hidden="true" />
+      <Method Name="checkProperties" Hidden="true" />
+      <Method Name="Contains" Hidden="true" />
+      <Method Name="CreateDirectory" Hidden="true" />
+      <Method Name="CSIDLtoPIDL" Hidden="true" />
+      <Method Name="Delete" Hidden="true" />
+      <Method Name="DirectoryInfoEx" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="EnumDirs" Hidden="true" />
+      <Method Name="EnumFiles" Hidden="true" />
+      <Field Name="fileflag" Hidden="true" />
+      <Field Name="flag" Hidden="true" />
+      <Field Name="folderflag" Hidden="true" />
+      <Method Name="getDirectoryRoot" Hidden="true" />
+      <Method Name="GetFolderPath" Hidden="true" />
+      <Method Name="getObjectData" Hidden="true" />
+      <Method Name="GetSubDirectory" Hidden="true" />
+      <Method Name="GetSubFile" Hidden="true" />
+      <Method Name="IndexOf" Hidden="true" />
+      <Method Name="initDirectoryType" Hidden="true" />
+      <Method Name="initIShellFolder" Hidden="true" />
+      <Method Name="initStorage" Hidden="true" />
+      <Method Name="ISerializable.GetObjectData" Hidden="true" />
+      <Field Name="iShellFolder" Hidden="true" />
+      <Field Name="iStorage" Hidden="true" />
+      <Method Name="listContains" Hidden="true" />
+      <Method Name="listRemove" Hidden="true" />
+      <Method Name="refresh" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="System.IO.DirectoryInfoEx.DirectoryTypeEnum" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>IO\FileSystemInfoEx\DirectoryInfoEx.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IESAImEMQCACgCYggcAIASQAAEmICMAoAAAgQQkwIwQ=</HashCode>
+      <FileName>IO\FileSystemInfoEx\DirectoryInfoEx.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.IO.FileInfoEx">
+    <Position X="2.25" Y="1.75" Width="1.5" />
+    <Members>
+      <Method Name="checkExists" Hidden="true" />
+      <Method Name="checkProperties" Hidden="true" />
+      <Method Name="Delete" Hidden="true" />
+      <Method Name="ISerializable.GetObjectData" Hidden="true" />
+      <Method Name="refresh" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAFAAgAAAIAIQAAAAAABAAAGoCFAAAAAAAAAAEAA=</HashCode>
+      <FileName>IO\FileSystemInfoEx\FileInfoEx.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.IO.FileSystemInfoEx">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <Members>
+      <Field Name="_desktopShellFolder" Hidden="true" />
+      <Field Name="_exists" Hidden="true" />
+      <Field Name="_name" Hidden="true" />
+      <Field Name="_parent" Hidden="true" />
+      <Field Name="_pidlFull" Hidden="true" />
+      <Field Name="_pidlRel" Hidden="true" />
+      <Method Name="~FileSystemInfoEx" Hidden="true" />
+      <Method Name="checkProperties" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="expandPath" Hidden="true" />
+      <Method Name="getDesktopShellFolder" Hidden="true" />
+      <Method Name="GetHashCode" Hidden="true" />
+      <Method Name="getObjectData" Hidden="true" />
+      <Method Name="getParentIShellFolder" Hidden="true" />
+      <Method Name="getParentPIDL" Hidden="true" />
+      <Method Name="getRelativePIDL" Hidden="true" />
+      <Method Name="init" Hidden="true" />
+      <Method Name="initParent" Hidden="true" />
+      <Method Name="ISerializable.GetObjectData" Hidden="true" />
+      <Method Name="loadAttributes" Hidden="true" />
+      <Method Name="loadName" Hidden="true" />
+      <Method Name="PathToPIDL" Hidden="true" />
+      <Method Name="PIDLToPath" Hidden="true" />
+      <Method Name="refresh" Hidden="true" />
+      <Method Name="refreshPIDL" Hidden="true" />
+      <Method Name="shGetFileAttribute" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BDgkIEAAMGpAAIKFgAAAQAQQBAmAIYJAAAAAgAEgMBA=</HashCode>
+      <FileName>IO\FileSystemInfoEx\FileSystemInfoEx.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.IO.DirectoryEx" Collapsed="true">
+    <Position X="8" Y="1.5" Width="1.25" />
+    <Members>
+      <Method Name="FSListToStringList" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAIABAgAAAAAAAAAAAgEAAAAAAAAAAA0AAQA=</HashCode>
+      <FileName>IO\Tools\DirectoryEx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.IO.FileEx" Collapsed="true">
+    <Position X="8" Y="0.75" Width="1.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgIAAIAAAAAAAAAAAAgEgAFAAAAAAAAEAAAA=</HashCode>
+      <FileName>IO\Tools\FileEx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.IO.FileStreamEx" Collapsed="true">
+    <Position X="6" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAQCAEQAQoGBAAAABgIAAAAAIACAAAABOMACA=</HashCode>
+      <FileName>IO\FileStreamEx\FileStreamEx.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="System.IO.Tools.ContextMenuWrapper" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAABEAAAAAAEAAAAAAAAAAACAAAAAIgQAgAAAA=</HashCode>
+      <FileName>IO\Tools\Wrappers\ContextMenuWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.IO.FileSystemWatcherEx" Collapsed="true">
+    <Position X="6" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAUAgABIAYAAQCAAAACAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>IO\Tools\Wrappers\FileSystemWatcherEx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.IO.DriveInfoEx" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAIIAAJAAAABAAAIBAAAAQAAAAAAAMACAAAAQgAABI=</HashCode>
+      <FileName>IO\FileSystemInfoEx\DriveInfoEx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,138 @@
+﻿<Window x:Class="AstoundingApplications.AstoundingDock.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:ui="clr-namespace:AstoundingApplications.AstoundingDock.Ui"
+        xmlns:utils="clr-namespace:AstoundingApplications.AstoundingDock.Utils"
+        xmlns:appbar="clr-namespace:AstoundingApplications.AppBarInterface;assembly=AppBarInterface"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Title="{Binding Path=Version, StringFormat={}Astounding Dock v.{0}, Mode=OneTime}" 
+        SizeToContent="Height" Width="400">
+    <Window.Resources>
+        <ResourceDictionary>      
+
+            <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="IconSizeValues">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="utils:IconSize"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="DockEdgeValues">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="appbar:DockEdge"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="ApplicationFilterValues">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="utils:ApplicationFilter"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Margin="0,10">
+            <Button Height="25" 
+                    Width="100" 
+                    Content="Ok" 
+                    IsDefault="True"
+                    IsCancel="True"
+                    Command="{Binding CloseCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" DockPanel.Dock="Left">
+            <GroupBox Header="General" Margin="5,5,5,5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Default tab" HorizontalAlignment="Left"/>
+                    <ComboBox  Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"
+                               ItemsSource="{Binding AvailableTabs}" SelectedItem="{Binding DefaultTab}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Application filter" HorizontalAlignment="Left"/>
+                    <ComboBox  Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"
+                               ItemsSource="{Binding Source={StaticResource ApplicationFilterValues}}" SelectedItem="{Binding ApplicationFilter}"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Run on startup" HorizontalAlignment="Left"/>
+                    <CheckBox  Grid.Row="2" Grid.Column="1" IsChecked="{Binding RunOnStartup}" VerticalAlignment="Center"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Appearance" Margin="5,5,5,5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Icon rows" HorizontalAlignment="Left"/>
+                    <ui:MvvmSlider Grid.Row="0" Grid.Column="1" 
+                                   Minimum="1" Maximum="5" 
+                                   Style="{StaticResource {x:Type Slider}}"
+                                   IsSnapToTickEnabled="True"
+                                   TickFrequency="1" 
+                                   Value="{Binding IconRows, UpdateSourceTrigger=Explicit}"/>                    
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding IconRows}" HorizontalAlignment="Left" Margin="5,2,5,2"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Theme" HorizontalAlignment="Left"/>
+                    <ComboBox  Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" 
+                               ItemsSource="{Binding Themes}" SelectedItem="{Binding CurrentTheme}"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Docking" Margin="5,5,5,5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Monitor" HorizontalAlignment="Left"/>
+                    <ComboBox  Grid.Row="0" Grid.Column="1" DisplayMemberPath="DeviceName"
+                               ItemsSource="{Binding Screens}" SelectedItem="{Binding ActiveScreen}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Reserve edge of screen" HorizontalAlignment="Left"/>
+                    <CheckBox  Grid.Row="1" Grid.Column="1" IsChecked="{Binding ReserveScreen}" VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Autohide" HorizontalAlignment="Left"/>
+                    <CheckBox  Grid.Row="2" Grid.Column="1" IsChecked="{Binding AutoHide}" VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Popup delay" HorizontalAlignment="Left" />
+                    <Slider    Grid.Row="3" Grid.Column="1" Minimum="250" Maximum="5000" TickFrequency="100" Value="{Binding PopupDelay}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"
+                               Text="{Binding Path=PopupDelay, StringFormat={} {0} ms, UpdateSourceTrigger=PropertyChanged}"/>                    
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Autohide delay" HorizontalAlignment="Left" />                    
+                    <Slider    Grid.Row="4" Grid.Column="1" Minimum="250" Maximum="5000" TickFrequency="100" Value="{Binding AutoHideDelay}" />
+                    <TextBlock Grid.Row="4" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"
+                               Text="{Binding Path=AutoHideDelay, StringFormat={} {0} ms, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Edge of screen" HorizontalAlignment="Left" />
+                    <ComboBox  Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Source={StaticResource DockEdgeValues}}" SelectedItem="{Binding DockEdge}"/>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+    </DockPanel>   
+</Window>

@@ -1,0 +1,21 @@
+﻿1.1.0.0
+	- Date: 2013/12/20
+	- Comments:
+		- Fix to sliding out twice issue when docking to the right/bottom.		
+		- Published to github.
+
+1.0.5.2:
+	- Date: 2013/10/28
+	- Comments:
+		- Attempting to fix full screen issue (noticable with Crysis 3). Removed most of the code which reacted to "FullScreenWindow" event.
+
+1.0.5.1:
+	- Date: 2013/09/07
+	- Comments:
+		- Will no longer throw an error if it cannot detect a mouse. This can happen if you connecting remotely into a machine. 
+
+1.0.5.0
+	- Date: 2013/04/20
+	- Comments:
+		- Fixed issue with compatibilities issues with the application "DualMonitorTaskbar". Around taskbar positioning
+		- Fixed issue with screen resolution changes

@@ -1,0 +1,160 @@
+﻿<ui:DockWindow x:Class="AstoundingApplications.AstoundingDock.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:ui="clr-namespace:AstoundingApplications.AstoundingDock.Ui"
+        xmlns:conv="clr-namespace:AstoundingApplications.AstoundingDock.Converters"
+        xmlns:vm="clr-namespace:AstoundingApplications.AstoundingDock.ViewModels"
+        xmlns:utils="clr-namespace:AstoundingApplications.AstoundingDock.Utils"
+        mc:Ignorable="d" 
+        AllowsTransparency="True"        
+        Background="Transparent"
+        Title="AstoundingDock"   
+        Height="0"        
+        Width="0">
+    <ui:DockWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>                
+                <ResourceDictionary Source="../Themes/AppDockTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <conv:ImagePathToImageSourceConverter x:Key="ImagePathToImageSource"/>
+            <conv:ImagePathToImageConverter x:Key="ImagePathToImage"/>
+            <conv:IconSizeToIntConverter x:Key="IconSizeToInt"/>
+
+            <!-- Standard context menus-->
+            <ContextMenu x:Key="MainContextMenu">
+                <MenuItem Command="{Binding AddTabCommand}" Header="Add New Tab"/>
+                <MenuItem Command="{Binding AddApplicationCommand}" Header="Add New Application"/>
+                <MenuItem Command="{Binding ViewApplicationsCommand}" Header="View Applications"/>
+                <MenuItem Command="{Binding OpenSettingsWindowCommand}" Header="Settings"/>
+                <MenuItem Command="{Binding OpenAboutCommand}" Header="About"/>
+                <MenuItem Command="{Binding CloseCommand}" Header="Close"/>
+            </ContextMenu>
+
+            <ContextMenu x:Key="TabContextMenu">
+                <MenuItem Command="{Binding EditCommand}" Header="Rename Tab"/>
+                <MenuItem Command="{Binding RemoveCommand}" Header="Remove Tab"/>
+                <MenuItem Header="Main Menu">
+                    <MenuItem Command="{Binding AddTabCommand}" Header="Add New Tab"/>
+                    <MenuItem Command="{Binding AddApplicationCommand}" Header="Add New Application"/>
+                    <MenuItem Command="{Binding ViewApplicationsCommand}" Header="View Applications"/>
+                    <MenuItem Command="{Binding OpenSettingsCommand}" Header="Settings"/>
+                    <MenuItem Command="{Binding OpenAboutCommand}" Header="About"/>
+                    <MenuItem Command="{Binding CloseCommand}" Header="Close"/>
+                </MenuItem>
+            </ContextMenu>
+
+            <ContextMenu x:Key="ApplicationContextMenu">
+                <MenuItem Command="{Binding EditCommand}" Header="Edit Dock Entry"/>
+                <MenuItem Command="{Binding RemoveCommand}" Header="Remove Dock Entry"/>
+            </ContextMenu>
+        </ResourceDictionary>
+    </ui:DockWindow.Resources>
+    <Canvas Background="Transparent" ui:DragDropBehaviour.CanDrop="True">
+        
+        <Grid x:Name="mainGrid" 
+              Height="0" 
+              Width="0"                  
+              Background="{StaticResource WindowBackgroundBrush}"
+              ContextMenu="{StaticResource MainContextMenu}">                          
+    
+            <ListBox x:Name="horizontalListBox"
+                     ItemsSource="{Binding Tabs}"
+                     ContextMenu="{StaticResource MainContextMenu}"                          
+                     Visibility="Collapsed"
+                     SelectedItem="{Binding ExpandedTab}"
+                     VirtualizingStackPanel.IsVirtualizing="False"
+                     ItemContainerStyle="{StaticResource BorderlessListBoxItem}"
+                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Expander ToolTip="{Binding Title}"
+                                  ui:DragDropBehaviour.CanDrop="True"
+                                  IsExpanded="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                  ContextMenu="{StaticResource TabContextMenu}">
+                            <Expander.Header>
+                                <TextBlock Text="{Binding Title}" 
+                                           Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"/>
+                            </Expander.Header>
+                            <ItemsControl ItemsSource="{Binding ApplicationsView}"
+                                          ui:DragDropBehaviour.CanDrop="True"
+                                          ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button ContextMenu="{StaticResource ApplicationContextMenu}"
+                                                ui:DragDropBehaviour.CanDrag="True"
+                                                ui:DragDropBehaviour.CanDrop="True"
+                                                Style="{StaticResource AppButton}"
+                                                Margin="3,3,3,3"
+                                                Command="{Binding RunCommand}"
+                                                ToolTip="{Binding Title}"
+                                                ui:ShellContextMenuBehaviour.OpenShellContextMenu="True">
+                                            <Image Source="{Binding Path=ImagePath,
+                                                                    Converter={StaticResource ImagePathToImageSource},
+                                                                    ConverterParameter=Medium}"
+                                                   Width="32" Height="32"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>                        
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <Menu x:Name="verticalMenu"
+                  ItemsSource="{Binding Tabs}"
+                  ContextMenu="{StaticResource MainContextMenu}"
+                  Visibility="Collapsed"
+                  VirtualizingStackPanel.IsVirtualizing="False"
+                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <Menu.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Header" Value="{Binding Title}"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="ItemsSource" Value="{Binding Applications}"/>
+                        <Setter Property="ContextMenu" Value="{StaticResource TabContextMenu}"/>
+                        <Setter Property="StaysOpenOnClick" Value="True"/>
+                        <Setter Property="ui:DragDropBehaviour.CanDrop" Value="True"/>
+                        <Setter Property="ui:AppMenuItemBehaviour.DoNotHideIfOpen" Value="True"/>
+                        <Setter Property="ui:PreloadingMenuBehaviour.EnabledPreloading" Value="True"/>
+                        <Setter Property="ItemContainerStyle">
+                            <Setter.Value>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                    <Setter Property="Header" Value="{Binding Title}"/>
+                                    <Setter Property="Command" Value="{Binding RunCommand}"/>
+                                    <Setter Property="ContextMenu" Value="{StaticResource ApplicationContextMenu}"/>
+                                    <Setter Property="StaysOpenOnClick" Value="False"/>
+                                    <Setter Property="ui:DragDropBehaviour.CanDrag" Value="True"/>
+                                    <Setter Property="ui:DragDropBehaviour.CanDrop" Value="True"/>
+                                    <Setter Property="ui:ShellContextMenuBehaviour.OpenShellContextMenu" Value="True"/>
+                                    <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Standard"/>
+                                    <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="False"/>
+                                    <Setter Property="Height" Value="32"/>
+                                    <Setter Property="Icon" Value="{Binding Path=ImagePath,
+                                                                            IsAsync=True,
+                                                                            Converter={StaticResource ImagePathToImage},
+                                                                            ConverterParameter=Medium}"/>
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Menu.ItemContainerStyle>
+            </Menu>      
+        </Grid>
+    </Canvas>    
+</ui:DockWindow>

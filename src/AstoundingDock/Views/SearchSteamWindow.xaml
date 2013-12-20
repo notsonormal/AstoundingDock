@@ -1,0 +1,43 @@
+﻿<Window x:Class="AstoundingApplications.AstoundingDock.Views.SearchSteamWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:ui="clr-namespace:AstoundingApplications.AstoundingDock.Ui"
+        WindowStartupLocation="CenterScreen"       
+        FocusManager.FocusedElement="{Binding ElementName=quickSearchTextBox}"
+        Title="Installed Steam Applications" Height="500" Width="1000">
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <cmd:EventToCommand Command="{Binding CleanupCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <ComboBox ItemsSource="{Binding Tabs}" 
+                      DisplayMemberPath="Title" 
+                      SelectedItem="{Binding SelectedTab}" 
+                      MinWidth="120" Margin="5,5,5,5"/>
+
+            <Button Content="Add Selected" Command="{Binding AddSelectedCommand}" Margin="5,5,5,5" Width="100" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Quick Search: " Margin="5,5,5,5" HorizontalAlignment="Right"/>
+
+                <TextBox Text="{Binding QuickSearchText, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="100" 
+                         Margin="5,5,5,5" 
+                         x:Name="quickSearchTextBox" 
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"/>
+            </StackPanel>
+        </DockPanel>
+
+        <ui:SearchResultsControl DockPanel.Dock="Top"/>
+    </DockPanel>
+</Window>

@@ -1,0 +1,36 @@
+﻿<Window x:Class="AstoundingApplications.AstoundingDock.Views.TabWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:AstoundingApplications.AstoundingDock.Ui"
+        FocusManager.FocusedElement="{Binding ElementName=titleTextBox}"
+        Title="Rename Tab"  
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight">
+    <DockPanel Margin="5,5,5,5">
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,5,5,5" DockPanel.Dock="Bottom">
+            <Button Height="25" Width="88"  Content="Save"   Command="{Binding SaveCommand}" IsDefault="True"/>
+            <Button Height="25" Width="100" Content="Cancel" Command="{Binding CancelCommand}" Margin="10,0,0,0" IsCancel="True"/>
+        </StackPanel>
+        
+        <Grid Margin="5,5,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="140"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Title:" HorizontalAlignment="Left"/>
+            <TextBox   Grid.Row="0" Grid.Column="1" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Name="titleTextBox"/>
+
+            <!--
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Expanded:" HorizontalAlignment="Left"/>
+            <CheckBox  Grid.Row="1" Grid.Column="1" IsChecked="{Binding IsExpanded}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+            -->
+        </Grid>        
+    </DockPanel>
+</Window>
