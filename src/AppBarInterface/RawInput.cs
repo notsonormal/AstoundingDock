@@ -113,7 +113,9 @@ namespace AstoundingApplications.AppBarInterface
 
                             if (additionalInfo.ContainsKey("Class"))
                             {
-                                switch (additionalInfo["Class"].ToUpper())
+                                string deviceClass = additionalInfo["Class"] ?? "";
+
+                                switch (deviceClass.ToUpper())
                                 {
                                     case "KEYBOARD":
                                         if (!keyboards.Contains(dInfo))
