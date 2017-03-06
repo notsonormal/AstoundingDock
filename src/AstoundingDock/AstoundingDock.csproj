@@ -394,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
+    <Content Include="Setup\AstoundingDock 1.1.1.0.exe" />
     <Content Include="Setup\AstoundingDockSetup.exe" />
     <Content Include="Setup\dotNetFx40_Client_setup.exe" />
     <Content Include="Setup\install.iss" />
