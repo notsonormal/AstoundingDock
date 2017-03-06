@@ -50,7 +50,7 @@ namespace AstoundingApplications.AstoundingDock.Utils
             }
             else
             {
-                if ((LastChecked - DateTime.Now).Minutes > 5)
+                if ((LastChecked - DateTime.Now).TotalMinutes > 5)
                 {
                     Installed = GetInstalledApplications();
                 }

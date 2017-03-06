@@ -86,8 +86,8 @@ namespace AstoundingApplications.AppBarInterface
                 //string deviceName;
                 //uint pcbSize = 0;
 
-                RAWINPUTDEVICELIST rid = (RAWINPUTDEVICELIST)Marshal.PtrToStructure(
-                    new IntPtr((pRawInputDeviceList.ToInt32() + (dwSize * i))), typeof(RAWINPUTDEVICELIST));
+                IntPtr ptr = new IntPtr(pRawInputDeviceList.ToInt64() + (dwSize * i));
+                RAWINPUTDEVICELIST rid = (RAWINPUTDEVICELIST)Marshal.PtrToStructure(ptr, typeof(RAWINPUTDEVICELIST));
 
                 string deviceName = Win32RawInput.GetDeviceName(rid.hDevice);
 

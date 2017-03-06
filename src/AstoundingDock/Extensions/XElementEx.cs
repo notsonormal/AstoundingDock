@@ -59,10 +59,10 @@ namespace AstoundingApplications.AstoundingDock.Extensions
 
         public static string GetAttribute(this XElement element, string name)
         {
-            XElement subElement = element.Element(name);
-            if (subElement == null || String.IsNullOrWhiteSpace(subElement.Value))
+            XAttribute attribute = element.Attribute(name);
+            if (attribute == null || String.IsNullOrWhiteSpace(attribute.Value))
                 return null;
-            return subElement.Value;
-        }            
+            return attribute.Value;
+        }
     }
 }

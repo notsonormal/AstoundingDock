@@ -20,6 +20,7 @@ using Menu = System.Windows.Controls.Menu;
 using TabControl = System.Windows.Controls.TabControl;
 using System.Windows.Input;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AstoundingApplications.AstoundingDock.Ui
 {
@@ -217,11 +218,11 @@ namespace AstoundingApplications.AstoundingDock.Ui
             new UIPropertyMetadata(1000));
         #endregion
 
-
         #region Fields
-        private static log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        static log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         const int VerticallyDockedHeight = 32;
         readonly TimeSpan SlideDuration = TimeSpan.FromMilliseconds(300);
+        static readonly object _isStealingFocusLocker = new object();
 
         Grid _mainGrid;
         Menu _verticalMenu;
@@ -231,6 +232,7 @@ namespace AstoundingApplications.AstoundingDock.Ui
         bool _isMenuOpen;
         bool _isShellContextMenuOpen;        
         ActionQueue _actionQueue;
+        bool _isStealingFocus;
         #endregion
 
         public DockWindow()
@@ -257,6 +259,24 @@ namespace AstoundingApplications.AstoundingDock.Ui
 
             Observable.FromEventPattern(this, "ContextMenuOpening").Subscribe(ep => _isContextMenuOpen = true);
             Observable.FromEventPattern(this, "ContextMenuClosing").Subscribe(ep => _isContextMenuOpen = false);
+        }
+
+        bool IsStealingFocus
+        {
+            get
+            {
+                lock (_isStealingFocusLocker)
+                {
+                    return _isStealingFocus;
+                }
+            }
+            set
+            {
+                lock (_isStealingFocusLocker)
+                {
+                    _isStealingFocus = value;
+                }
+            }
         }
 
         public void PopupWindow()
@@ -315,55 +335,39 @@ namespace AstoundingApplications.AstoundingDock.Ui
                     ShowWindow();
                     break;
                 case AppBarNotificationAction.FullScreenApp:
-                    ClearAnimations();
-
-                    if ((bool)e.Data) 
-                    {
-                        Log.Debug("FullScreenApp opened");
-
-                        //Position position = new Position();
-                        //if (_appbar.ReserveScreen)
-                        //{
-                        //    Width = 0;
-                        //    Height = 0;                            
-
-                        //    _appbar.Resize(ref position);
-                        //}
-                    }
-                    else
-                    {
-                        Log.Debug("FullScreenApp closed");
-
-                        Position position = CalculateSlideOutPosition();
-
-                        if (_appbar.ReserveScreen)
-                        {
-                            _appbar.Resize(ref position);
-                            Log.DebugFormat("SlideOut after resize position {0}", position);
-                        }
-
-                        _actionQueue.QueueAction(SlideOut);
-
-                        /*
-                        DispatcherHelper.UIDispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
-                            {
-                                Top = position.Top;
-                                Left = position.Left;
-                                Width = position.Width;
-                                Height = position.Height;
-
-                                _mainGrid.Width = position.Width;
-                                _mainGrid.Height = position.Height;
-
-                                System.Threading.Thread.Sleep(5000);
-
-                                HideWindow();
-                                ShowWindow();
-                            }));
-                         */
-                    }
+                    OnFullScreenWindowChanged((bool)e.Data);
                     break;
             }
+        }
+
+        void OnFullScreenWindowChanged(bool isFullScreen)
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                if (isFullScreen)
+                {
+                    Log.Debug("FullScreenApp opened");
+
+                    // Windows seems to automatically push the dock into the background when a full screen 
+                    // application is opened
+                }
+                else
+                {
+                    Log.Debug("FullScreenApp closed");
+
+                    // When the full screen application is closed the dock is still underneath all the applicationsn
+                    // and even the desktop. This is fine when in autohide mode but is a problem otherwise. 
+                    
+                    // If we set the width/height to 0 and then do the slide out action, it looks the dock was hidden
+                    // of the screen when the other application was in full screen and we just putting dock back
+                    if (_appbar.ReserveScreen || !AutoHide)
+                    {
+                        Width = 0;
+                        Height = 0;
+                        _actionQueue.QueueAction(SlideOut);
+                    }           
+                }
+            });
         }
 
         void OnSettingChanged(SettingChangedMessage message)
@@ -927,9 +931,32 @@ namespace AstoundingApplications.AstoundingDock.Ui
         /// Forcing pushes the window to the top, skipping all the restrictions
         /// on Activate/SetForegroundWindow.
         /// </summary>
-        public static bool StealFocus(IntPtr handle)
+        public void StealFocus(IntPtr handle)
         {
             Log.DebugFormat("StealFocus");
+
+            if (IsStealingFocus)
+            {
+                Log.Warn("Unable to push the dock to the foreground since it seems like we in the middle of doing it. " +
+                    "This function can sometimes hang and there is nothing we can do about. If this is a problem, " +
+                    "restarting the application should fix it. ");
+                return;
+            }
+
+            // Calling this asynchronously as the StealFocusTask function can hang 
+            IsStealingFocus = true;
+            Task task = Task.Factory.StartNew(() =>
+            {
+                StealFocusTask(handle);
+                IsStealingFocus = false;
+            });
+        }
+
+        static bool StealFocusTask(IntPtr handle)
+        {
+            // NOTE: The Win32.AttachThreadInput function can hang
+            // http://blogs.msdn.com/b/oldnewthing/archive/2008/08/01/8795860.aspx
+
             uint foregroundId = Win32Window.GetWindowThreadProcessId(Win32Window.GetForegroundWindow());
             uint currentId = Win32.GetCurrentThreadId();
 
@@ -938,6 +965,7 @@ namespace AstoundingApplications.AstoundingDock.Ui
 
             //bool returnValue = Win32Window.SetForegroundWindow(handle);
             bool returnValue = Win32Window.BringWindowToTop(handle);
+            Log.DebugFormat("BringWindowToTop, Result: {0}", returnValue);
 
             if (foregroundId != currentId)
                 Win32.AttachThreadInput(foregroundId, currentId, false); // Deattach

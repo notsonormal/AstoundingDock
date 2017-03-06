@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppBarException.cs" />
+    <Compile Include="AppBarUtils.cs" />
     <Compile Include="DockPosition.cs" />
     <Compile Include="IAppBar.cs" />
     <Compile Include="Position.cs" />

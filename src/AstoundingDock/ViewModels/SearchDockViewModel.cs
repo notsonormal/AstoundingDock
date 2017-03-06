@@ -50,12 +50,6 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
         {
             foreach (var tab in Tabs)
             {
-                if (_loadWorker.CancellationPending)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-
                 foreach (var application in tab.Applications)
                 {
                     if (_loadWorker.CancellationPending)

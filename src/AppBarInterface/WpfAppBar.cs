@@ -487,9 +487,7 @@ namespace AstoundingApplications.AppBarInterface
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
-            {
-                _disposed = true;
-
+            {                
                 // Dispose managed resources.
                 if (disposing)
                 {
@@ -509,6 +507,8 @@ namespace AstoundingApplications.AppBarInterface
                     _toolbar.SetAutoHide(Docked, false);
                     _toolbar.Unregister();
                 }
+
+                _disposed = true;
             }
         }
 
