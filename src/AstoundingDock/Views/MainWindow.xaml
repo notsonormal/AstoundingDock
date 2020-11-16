@@ -36,7 +36,9 @@
             </ContextMenu>
 
             <ContextMenu x:Key="TabContextMenu">
-                <MenuItem Command="{Binding EditCommand}" Header="Rename Tab"/>
+                <MenuItem Command="{Binding IncreaseTabOrderCommand}" Header="{Binding IncreaseTabOrderCommandHeader}"/>
+                <MenuItem Command="{Binding DecreaseTabOrderCommand}" Header="{Binding DecreaseTabOrderCommandHeader}"/>
+                <MenuItem Command="{Binding EditCommand}" Header="Edit Tab"/>
                 <MenuItem Command="{Binding RemoveCommand}" Header="Remove Tab"/>
                 <MenuItem Header="Main Menu">
                     <MenuItem Command="{Binding AddTabCommand}" Header="Add New Tab"/>
@@ -73,10 +75,13 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Expander ToolTip="{Binding Title}"
-                                  ui:DragDropBehaviour.CanDrop="True"
+                        <ui:NoRightClickExpander ToolTip="{Binding Title}"
+                                  ui:DragDropBehaviour.CanDrop="True"                                  
                                   IsExpanded="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
                                   ContextMenu="{StaticResource TabContextMenu}">
+                            <Expander.Style>
+                                <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}"/>
+                            </Expander.Style>
                             <Expander.Header>
                                 <TextBlock Text="{Binding Title}" 
                                            Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"/>
@@ -108,7 +113,7 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </Expander>                        
+                        </ui:NoRightClickExpander>                        
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

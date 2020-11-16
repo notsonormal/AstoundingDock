@@ -75,6 +75,41 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
                  */
             }
         }
+
+        public int TabOrder
+        {
+            get { return Model.TabOrder; }
+            set { Model.TabOrder = value; }
+        }
+
+        public string IncreaseTabOrderCommandHeader
+        {
+            get
+            {
+                if (Configuration.DockPosition.Selected == AppBarInterface.DockEdge.Top ||
+                   Configuration.DockPosition.Selected == AppBarInterface.DockEdge.Bottom)
+                {
+                    return "Move Left";
+                }
+
+                return "Move Up";
+            }
+        }
+
+        public string DecreaseTabOrderCommandHeader
+        {
+            get
+            {
+                if (Configuration.DockPosition.Selected == AppBarInterface.DockEdge.Top ||
+                   Configuration.DockPosition.Selected == AppBarInterface.DockEdge.Bottom)
+                {
+                    return "Move Right";
+                }
+
+                return "Move Down";
+            }
+        }
+
         public ObservableCollection<ApplicationViewModel> Applications { get; private set; }
         public ListCollectionView ApplicationsView { get; private set; }
         #endregion        
@@ -91,6 +126,7 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             Title = other.Title;
             IsExpanded = other.IsExpanded;
             Applications = other.Applications;
+            TabOrder = other.TabOrder;
         }
 
         void UpdateFilter(ApplicationFilter filter)
@@ -214,6 +250,28 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             }
         }
 
+        public ICommand IncreaseTabOrderCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Messenger.Default.Send<TabMessage>(TabMessage.MoveUp(this));
+                });
+            }
+        }
+
+        public ICommand DecreaseTabOrderCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Messenger.Default.Send<TabMessage>(TabMessage.MoveDown(this));
+                });
+            }
+        }
+
         public ICommand AddTabCommand
         {
             get
@@ -278,7 +336,7 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
                     Messenger.Default.Send<TabToMainMessage>(TabToMainMessage.Close());
                 });
             }
-        }
+        }        
         #endregion
     }
 }

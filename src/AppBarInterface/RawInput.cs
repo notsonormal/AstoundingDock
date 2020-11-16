@@ -275,13 +275,30 @@ namespace AstoundingApplications.AppBarInterface
                 // The final part is the class GUID and is not needed here
 
                 // Open the appropriate key as read-only so no permissions are needed.
-                RegistryKey OurKey = Registry.LocalMachine;
+                var enumRegistryKey = Registry.LocalMachine;
+
                 string findme = String.Format(@"System\CurrentControlSet\Enum\{0}\{1}\{2}", id_01, id_02, id_03);
-                OurKey = OurKey.OpenSubKey(findme, false);
+                enumRegistryKey = enumRegistryKey.OpenSubKey(findme, false);
 
                 // Retrieve the desired information and set isKeyboard
-                info["DeviceDesc"] = (string)OurKey.GetValue("DeviceDesc");
-                info["Class"] = (string)OurKey.GetValue("Class");
+                info["DeviceDesc"] = (string)enumRegistryKey.GetValue("DeviceDesc");
+                info["Class"] = (string)enumRegistryKey.GetValue("Class");
+
+                string classGuid = (string)enumRegistryKey.GetValue("ClassGUID");
+
+                enumRegistryKey.Dispose();
+                
+                if (info["Class"] == null && classGuid != null)
+                {
+                    var classRegisteryKey = Registry.LocalMachine;
+
+                    findme = String.Format(@"System\CurrentControlSet\Control\Class\{0}", classGuid);
+
+                    classRegisteryKey = classRegisteryKey.OpenSubKey(findme, false);
+                    info["Class"] = (string)classRegisteryKey.GetValue("Class");
+
+                    classRegisteryKey.Dispose();
+                }
             }
 
             return info;

@@ -106,6 +106,21 @@ namespace AstoundingApplications.AppBarInterface
         /// </summary>
         public void QueryPosition(ref Position position, DockPosition dock)
         {
+            //TODO:
+
+            //ABM_QUERYPOS seems to do nothing on Windows 10. It gives back the exact
+            //same dimensions, not adjusting for the start bar
+
+            //When the dock is docked to the left for example, it doesn't take the
+            //entire screen length because the start bar is there. I used ABM_QUERYPOS
+            //to tell me how much space Windows actually assigned to to the dock
+
+            //Since ABM_QUERYPOS doesn't work properly on Windows 10, I've decided
+            //to only allow the screen to be reserved when docked to top of the screen,
+            //with the assumption that the start bar is always on the botton of the screen
+            
+            //The code is being left "as is" in case I figure out the solution to it
+
             APPBARDATA msgData = new APPBARDATA();
             msgData.cbSize = Marshal.SizeOf(msgData);
             msgData.hWnd = _handle;
@@ -133,6 +148,9 @@ namespace AstoundingApplications.AppBarInterface
             msgData.hWnd = _handle;
             msgData.uEdge = (uint)dock.ToNative();
             position.ToNative(ref msgData.rc);
+
+            if (dock.Selected == DockEdge.Top)
+                msgData.rc.bottom = msgData.rc.bottom + 8;
 
             Win32AppBar.SHAppBarMessage(ABM.ABM_SETPOS, ref msgData);
             position = Position.FromNative(ref msgData.rc);
@@ -188,10 +206,10 @@ namespace AstoundingApplications.AppBarInterface
                         // lParam = 1 (true)  if a full screen app has been opened.
                         // lParam = 0 (false) if a full screen app has been closed.
                         ToolbarEvent(this, new AppBarEventArgs()
-                            {
-                                Action = AppBarNotificationAction.FullScreenApp,
-                                Data = lParam.ToInt32() == Win32.TRUE
-                            });
+                        {
+                            Action = AppBarNotificationAction.FullScreenApp,
+                            Data = lParam.ToInt32() == Win32.TRUE
+                        });
                         break;
                     case ABN.ABN_STATECHANGE:
                         ToolbarEvent(this, new AppBarEventArgs(AppBarNotificationAction.StateChanged));
@@ -209,7 +227,7 @@ namespace AstoundingApplications.AppBarInterface
             }
             else
             {
-                Debug.WriteLine((WM)msg);
+                //Debug.WriteLine((WM)msg);
 
                 // Messages sent by/to other windows
                 switch ((WM)msg)

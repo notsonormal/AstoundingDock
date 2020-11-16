@@ -36,13 +36,13 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             _database = database;
             Tabs = new ObservableCollection<TabViewModel>();
             TabsView = (ListCollectionView) CollectionViewSource.GetDefaultView(Tabs);
-            TabsView.SortDescriptions.Add(new SortDescription("Title", ListSortDirection.Ascending));
+            TabsView.SortDescriptions.Add(new SortDescription("TabOrder", ListSortDirection.Ascending));
 
             // Loading applications asynchronously using reactive extensions to reduce initial startup time.
             
             // TODO: Does this actually speed things up or is it loading all the sections before add doing
             // the subscribe??
-            _database.LoadTabs().ToObservable().Subscribe(tabModel =>
+            _database.LoadTabs().OrderBy(x => x.TabOrder).ToObservable().Subscribe(tabModel =>
             {
                 TabViewModel tabViewModel = new TabViewModel(tabModel);
                 Tabs.Add(tabViewModel);
@@ -50,6 +50,8 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             },
             () => // OnComplete
             {
+                FixTabOrdering();
+
                 Tabs.CollectionChanged += OnTabsChanged;
 
                 // Expand the default tab when the application starts up.
@@ -151,8 +153,14 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
                 case TabMessage.ActionType.Move:
                     Move(message.Tab, message.TabB);
                     break;
+                case TabMessage.ActionType.MoveUp:
+                    ReorderTabs(message.Tab, true);
+                    break;
+                case TabMessage.ActionType.MoveDown:
+                    ReorderTabs(message.Tab, false);
+                    break;
             }
-        }
+        }        
 
         void OnTabToMainMessage(TabToMainMessage message)
         {
@@ -343,6 +351,8 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
                 return;
             }
 
+            addThis.TabOrder = Tabs.Max(x => x.TabOrder) + 1;
+
             Tabs.Add(addThis);
         }
 
@@ -375,10 +385,6 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
 
             toEdit.UpdateWith(editTab);
             Messenger.Default.Send<DatabaseMessage>(DatabaseMessage.Update(toEdit.Model));
-
-            // Refresh the view to reapply the sort in case the tab was renamed.
-            // Needs to be done after 'UpdateWith' is called.
-            TabsView.Refresh();
         }
 
         void Remove(TabViewModel removeThis)
@@ -421,6 +427,55 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
                 throw new ArgumentNullException("moveToThis");  
 
             Tabs.Move(Tabs.IndexOf(moveThis), Tabs.IndexOf(moveToThis));
+        }
+
+        /// <summary>
+        /// If we mess up the tab ordering just reset the order
+        /// </summary>
+        void FixTabOrdering()
+        {
+            int tabsWithDefaultOrder = Tabs.Count(x => x.TabOrder == 1);
+            int tabsWithMaxOrder = Tabs.Count(x => x.TabOrder == Tabs.Max(m => m.TabOrder));
+
+            if (tabsWithDefaultOrder > 1 || tabsWithMaxOrder > 1)
+            {
+                int order = 1;
+                foreach (var tab in Tabs.OrderBy(x => x.Title))
+                {
+                    tab.TabOrder = order;
+                    order++;
+
+                    Messenger.Default.Send<DatabaseMessage>(DatabaseMessage.Update(tab.Model));
+                }
+
+                // Refresh the view to reapply the sort
+                TabsView.Refresh();
+            }
+        }
+
+        void ReorderTabs(TabViewModel tab, bool moveUp)
+        {
+            if (moveUp && tab.TabOrder == 1)
+                return;
+
+            if (!moveUp && tab.TabOrder == Tabs.Max(x => x.TabOrder))
+                return;
+
+            int currentPosition = Tabs.IndexOf(tab);
+            int newPosition = moveUp ? currentPosition - 1 : currentPosition + 1;
+            Tabs.Move(currentPosition, newPosition);
+
+            int tabOrder = 1;
+            foreach (var item in Tabs)
+            {
+                item.TabOrder = tabOrder;
+                tabOrder++;
+
+                Messenger.Default.Send<DatabaseMessage>(DatabaseMessage.Update(item.Model));
+            }
+
+            // Refresh the view to reapply the sort
+            TabsView.Refresh();
         }
 
         #region Commands

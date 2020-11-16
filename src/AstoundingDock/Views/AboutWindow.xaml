@@ -30,8 +30,8 @@
 
                 <TextBlock Grid.Row="2" Margin="5,5,5,5" HorizontalAlignment="Center">
                         <Button Command="{Binding NavigateCommand}"                                                  
-                                CommandParameter="http://www.astoundingapplications.com/astoundingdock.htm">
-                            <TextBlock Margin="5,5,5,5" Text="Goto webpage"/>
+                                CommandParameter="https://github.com/notsonormal/AstoundingDock">
+                            <TextBlock Margin="5,5,5,5" Text="Goto Github page"/>
                         </Button>
                 </TextBlock> 
                 

@@ -30,7 +30,7 @@ namespace AstoundingApplications.AppBarInterface
         public static readonly int AutoHideDelay = 1000;
         public static readonly bool AutoHide = false;
         public static readonly bool ReserveScreen = false;
-        public static readonly DockEdge Docked = DockEdge.Right;
+        public static readonly DockEdge Docked = DockEdge.Left;
     }
 
     public interface IAppBar

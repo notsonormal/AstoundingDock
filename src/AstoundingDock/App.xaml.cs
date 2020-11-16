@@ -114,6 +114,16 @@ namespace AstoundingApplications.AstoundingDock
         {
             try
             {
+                Logger.Error(string.Format("OnUnhandledException, Message: {0}, StackTrace: {1}",
+                    e.Exception.Message, e.Exception.StackTrace));
+            }
+            catch
+            {
+                //Can't have problems writing logs blocking the dialog window from showing up
+            }
+
+            try
+            {
                 var result = ServiceManager.GetService<IMessageBoxService>().Show(e.Exception.Message,
                     "Astounding Dock -- Unexpected ErrorEvent", MessageIcon.Error, MessageOptions.ContinueClose);
 

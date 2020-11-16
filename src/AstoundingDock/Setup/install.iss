@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{634D2665-E85F-473A-B861-F75A3C4E7A25}
 AppName=Astounding Dock
-AppVerName=Astounding Dock 1.1.1.0
+AppVerName=Astounding Dock 1.2.0.0
 AppPublisher=Astounding Applications
 DefaultDirName={pf}\Astounding Dock
 DefaultGroupName=Astounding Dock

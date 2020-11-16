@@ -10,17 +10,11 @@
         Title="{Binding Path=Version, StringFormat={}Astounding Dock v.{0}, Mode=OneTime}" 
         SizeToContent="Height" Width="400">
     <Window.Resources>
-        <ResourceDictionary>      
+        <ResourceDictionary>
 
             <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="IconSizeValues">
                 <ObjectDataProvider.MethodParameters>
                     <x:Type TypeName="utils:IconSize"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
-
-            <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type sys:Enum}" x:Key="DockEdgeValues">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="appbar:DockEdge"/>
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
 
@@ -130,7 +124,7 @@
                                Text="{Binding Path=AutoHideDelay, StringFormat={} {0} ms, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <TextBlock Grid.Row="5" Grid.Column="0" Text="Edge of screen" HorizontalAlignment="Left" />
-                    <ComboBox  Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Source={StaticResource DockEdgeValues}}" SelectedItem="{Binding DockEdge}"/>
+                    <ComboBox  Grid.Row="5" Grid.Column="1" ItemsSource="{Binding DockEdgeValues}" SelectedItem="{Binding DockEdge}"/>
                 </Grid>
             </GroupBox>
         </StackPanel>

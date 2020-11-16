@@ -12,20 +12,21 @@ namespace AstoundingApplications.AstoundingDock.Models
         string _title;
         string _oldTitle;
 
-        public TabModel() : this(null, true, new List<ApplicationModel>())
+        public TabModel() : this(null, true, 1, new List<ApplicationModel>())
         {
         }
 
-        public TabModel(string title, bool isExpanded) : 
-            this(title, isExpanded, new List<ApplicationModel>()) 
+        public TabModel(string title, bool isExpanded, int tabOrder) : 
+            this(title, isExpanded, tabOrder, new List<ApplicationModel>()) 
         { 
         }
 
-        public TabModel(string title, bool isExpanded, List<ApplicationModel> applications)
+        public TabModel(string title, bool isExpanded, int tabOrder, List<ApplicationModel> applications)
         {
             _title = title;
             IsExpanded = isExpanded;
             Applications = applications;
+            TabOrder = tabOrder;
         }        
 
         public string Title
@@ -39,11 +40,12 @@ namespace AstoundingApplications.AstoundingDock.Models
         }
         public string OldTitle { get { return _oldTitle ?? _title; } }
         public bool IsExpanded { get; set; }
+        public int TabOrder { get; set; }
         public List<ApplicationModel> Applications { get; private set; }
 
         public TabModel Copy()
         {
-            TabModel section = new TabModel(Title, IsExpanded, Applications.ToList());
+            TabModel section = new TabModel(Title, IsExpanded, TabOrder, Applications.ToList());
             return section;
         }
 

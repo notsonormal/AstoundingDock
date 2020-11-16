@@ -38,7 +38,7 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             }
 
             Themes = new ObservableCollection<string>();
-            
+
             foreach (string theme in WpfHelper.AvailableThemes)
             {
                 Themes.Add(theme);
@@ -51,7 +51,7 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             if (value)
                 registryKey.SetValue("AstoundingDock", FileHelper.GetApplicationExe());
             else
-                registryKey.DeleteValue("AstoundingDock", false);   
+                registryKey.DeleteValue("AstoundingDock", false);
         }
 
         public int IconRows
@@ -63,7 +63,19 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
         public DockEdge DockEdge
         {
             get { return Configuration.DockPosition.Selected; }
-            set { Configuration.DockPosition = new DockPosition(value); }
+            set 
+            {
+                if (ReserveScreen && value != DockEdge.Top)
+                {
+                    ServiceManager.GetService<IMessageBoxService>().Show(
+                        "The dock can only reserve the screen when docked to the top. Disabling reserve screen.",
+                        "Astounding Dock");
+
+                    ReserveScreen = false;
+                }
+
+                Configuration.DockPosition = new DockPosition(value);
+            }
         }
 
         public Screen ActiveScreen
@@ -93,7 +105,18 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
         public bool ReserveScreen
         {
             get { return Configuration.ReserveScreen; }
-            set { Configuration.ReserveScreen = value; }
+            set 
+            {
+                if (value && Configuration.DockPosition.Selected != DockEdge.Top)
+                {
+                    ServiceManager.GetService<IMessageBoxService>().Show(
+                        "The dock can only reserve the screen when docked to the top",
+                        "Astounding Dock");
+                    return;
+                }
+
+                Configuration.ReserveScreen = value;
+            }
         }
 
         public ApplicationFilter ApplicationFilter
@@ -119,13 +142,27 @@ namespace AstoundingApplications.AstoundingDock.ViewModels
             set
             {
                 Configuration.RunOnStartup = value;
-                ToggleRunOnStartup(value);         
+                ToggleRunOnStartup(value);
             }
         }
 
         public ObservableCollection<string> AvailableTabs
         {
             get { return _availableTabs; }
+        }
+
+        public List<DockEdge> DockEdgeValues
+        {
+            get
+            {
+                return new List<DockEdge>()
+                {
+                    DockEdge.Left,
+                    DockEdge.Right,
+                    DockEdge.Top,
+                    DockEdge.Bottom
+                };
+            }
         }
 
         public string Version

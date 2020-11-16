@@ -260,7 +260,7 @@ namespace AstoundingApplications.AstoundingDock.Ui
                 TabViewModel tab = element.DataContext as TabViewModel;
                 if (tab == null)
                 {
-                    // TabViewModel not found it element, it's possible that the drop was done on the lastOpened 'Canvas' element.
+                    // TabViewModel is not found on the element, it's possible that the drop was done on the 'Canvas' element.
                     var tabControls = element.FindVisualChildren<TabControl>();
                     var menus = element.FindVisualChildren<Menu>();
                     var itemControls = element.FindVisualChildren<ItemsControl>();

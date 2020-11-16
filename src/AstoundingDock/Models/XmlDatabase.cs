@@ -223,7 +223,8 @@ namespace AstoundingApplications.AstoundingDock.Models
         {
             XElement xml = new XElement("Tab",
                     new XElement("Title", section.Title),
-                    new XElement("IsExpanded", section.IsExpanded));
+                    new XElement("IsExpanded", section.IsExpanded),
+                    new XElement("TabOrder", section.TabOrder));
             return xml;
         }
 
@@ -231,8 +232,9 @@ namespace AstoundingApplications.AstoundingDock.Models
         {
             string title = xml.GetValue("Title");
             bool isExpanded = xml.GetValue<bool>("IsExpanded", false);
+            int tabOrder = xml.GetValue<int>("TabOrder", 1);
 
-            return new TabModel(title, isExpanded);
+            return new TabModel(title, isExpanded, tabOrder);
         }
 
         XElement ApplicationToXml(ApplicationModel application)
@@ -291,7 +293,8 @@ namespace AstoundingApplications.AstoundingDock.Models
                         new XElement("Tabs",
                             new XElement("Tab",
                                 new XElement("Title", "General"),
-                                new XElement("IsExpanded", "True")
+                                new XElement("IsExpanded", "True"),
+                                new XElement("TabOrder", "1")
                             )
                         ),
                         new XElement("Applications")));

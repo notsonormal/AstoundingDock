@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace AstoundingApplications.AstoundingDock.Messages
 {
     class TabMessage
     {
-        public enum ActionType { Add, Remove, Edit, Move }
+        public enum ActionType { Add, Remove, Edit, Move, MoveUp, MoveDown }
 
         public ActionType Action { get; private set; }
         public TabViewModel Tab { get; private set; }
@@ -48,6 +49,24 @@ namespace AstoundingApplications.AstoundingDock.Messages
                 Action = ActionType.Move,
                 Tab = moveThis,
                 TabB = moveToThis
+            };
+        }
+
+        public static TabMessage MoveUp(TabViewModel moveThis)
+        {
+            return new TabMessage()
+            {
+                Action = ActionType.MoveUp,
+                Tab = moveThis
+            };
+        }
+
+        public static TabMessage MoveDown(TabViewModel moveThis)
+        {
+            return new TabMessage()
+            {
+                Action = ActionType.MoveDown,
+                Tab = moveThis
             };
         }
     }

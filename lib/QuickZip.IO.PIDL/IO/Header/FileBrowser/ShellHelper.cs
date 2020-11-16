@@ -18,11 +18,13 @@ namespace ShellDll
         /// <returns>The unsigned integer for the High Word</returns>
         public static uint HiWord(IntPtr ptr)
         {
-            if (((uint)ptr & 0x80000000) == 0x80000000)
-                return ((uint)ptr >> 16);
+            uint ptrFor64Bit = (uint)GetInt(ptr);
+
+            if ((ptrFor64Bit & 0x80000000) == 0x80000000)
+                return ptrFor64Bit >> 16;
             else
-                return ((uint)ptr >> 16) & 0xffff;
-        }
+                return (ptrFor64Bit >> 16) & 0xffff;
+        }        
 
         /// <summary>
         /// Retrieves the Low Word of a WParam of a WindowMessage
@@ -31,7 +33,17 @@ namespace ShellDll
         /// <returns>The unsigned integer for the Low Word</returns>
         public static uint LoWord(IntPtr ptr)
         {
-            return (uint)ptr & 0xffff;
+            uint ptrFor64Bit = (uint)GetInt(ptr);
+
+            return ptrFor64Bit & 0xffff;
+        }
+
+        /// <summary>
+        /// https://stackoverflow.com/questions/7913325/win-api-in-c-get-hi-and-low-word-from-intptr/17902757
+        /// </summary>
+        static int GetInt(IntPtr ptr)
+        {
+            return IntPtr.Size == 8 ? unchecked((int)ptr.ToInt64()) : ptr.ToInt32();
         }
 
         #endregion

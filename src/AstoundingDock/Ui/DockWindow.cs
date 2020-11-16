@@ -1,26 +1,23 @@
-﻿using System;
-using System.Reactive.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Forms;
-using System.Windows.Media.Animation;
-using AstoundingApplications.AppBarInterface;
+﻿using AstoundingApplications.AppBarInterface;
 using AstoundingApplications.AstoundingDock.Messages;
 using AstoundingApplications.AstoundingDock.Utils;
-using AstoundingApplications.AstoundingDock.Extensions;
 using AstoundingApplications.Win32Interface;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Threading;
-using System.Windows.Threading;
-using System.ComponentModel;
+using System;
 using System.Diagnostics;
-
-using ListBox = System.Windows.Controls.ListBox;
-using Menu = System.Windows.Controls.Menu;
-using TabControl = System.Windows.Controls.TabControl;
-using System.Windows.Input;
+using System.Drawing;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
+using ListBox = System.Windows.Controls.ListBox;
+using Menu = System.Windows.Controls.Menu;
 
 namespace AstoundingApplications.AstoundingDock.Ui
 {
@@ -220,7 +217,6 @@ namespace AstoundingApplications.AstoundingDock.Ui
 
         #region Fields
         static log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        const int VerticallyDockedHeight = 32;
         readonly TimeSpan SlideDuration = TimeSpan.FromMilliseconds(300);
         static readonly object _isStealingFocusLocker = new object();
 
@@ -236,29 +232,39 @@ namespace AstoundingApplications.AstoundingDock.Ui
         #endregion
 
         public DockWindow()
-        {            
-            this.Closing += OnClosing;
-            this.Loaded += OnLoaded;            
-
-            _actionQueue = new ActionQueue();
-            IconRows = Configuration.IconRows;
-            ActiveScreen = Configuration.ActiveScreen;
-            DockPosition = Configuration.DockPosition;
-            AutoHide = Configuration.AutoHide;
-            PopupDelay = Configuration.PopupDelay;
-            AutoHideDelay = Configuration.AutoHideDelay;
-            
-            _appbar = new WpfAppBar(this)
+        {
+            try
             {
-                AutoHideDelay = AutoHideDelay,
-                PopupDelay = PopupDelay,
-                ActiveScreen = ActiveScreen,
-                ReserveScreen = Configuration.ReserveScreen
-            };
-            _appbar.AppBarEvent += OnAppBarEvent;
 
-            Observable.FromEventPattern(this, "ContextMenuOpening").Subscribe(ep => _isContextMenuOpen = true);
-            Observable.FromEventPattern(this, "ContextMenuClosing").Subscribe(ep => _isContextMenuOpen = false);
+                this.Closing += OnClosing;
+                this.Loaded += OnLoaded;
+
+                _actionQueue = new ActionQueue();
+                IconRows = Configuration.IconRows;
+                ActiveScreen = Configuration.ActiveScreen;
+                DockPosition = Configuration.DockPosition;
+                AutoHide = Configuration.AutoHide;
+                PopupDelay = Configuration.PopupDelay;
+                AutoHideDelay = Configuration.AutoHideDelay;
+
+                _appbar = new WpfAppBar(this)
+                {
+                    AutoHideDelay = AutoHideDelay,
+                    PopupDelay = PopupDelay,
+                    ActiveScreen = ActiveScreen,
+                    ReserveScreen = Configuration.ReserveScreen
+                };
+                _appbar.AppBarEvent += OnAppBarEvent;
+
+                Observable.FromEventPattern(this, "ContextMenuOpening").Subscribe(ep => _isContextMenuOpen = true);
+                Observable.FromEventPattern(this, "ContextMenuClosing").Subscribe(ep => _isContextMenuOpen = false);
+            }
+            catch(Exception ex)
+            {
+                Log.Error(string.Format("Exception when creating the dock window, ErrorMessage: {0}, StackTrack: {1}",
+                    ex.Message, ex.StackTrace), ex);
+                throw;
+            }
         }
 
         bool IsStealingFocus
@@ -935,13 +941,22 @@ namespace AstoundingApplications.AstoundingDock.Ui
         {
             Log.DebugFormat("StealFocus");
 
+            //TODO: I wonder if we can just do a timer to check if it hangs? Either abort the thread or even just 
+            //restart the application. 
+
+            // (a) Aborting the thread might not work since it's a native thread that is hanging
+
+            // (b) Restarting the application should work but it is possible this would result in an infinite restart loop.
+            //Compared to that, the TryActivate simply failing to work properly is probably preferable. The boolean
+            //IsStealingFocus ensures that we won't ever have more than one hanging thread too.
+
             if (IsStealingFocus)
             {
                 Log.Warn("Unable to push the dock to the foreground since it seems like we in the middle of doing it. " +
                     "This function can sometimes hang and there is nothing we can do about. If this is a problem, " +
                     "restarting the application should fix it. ");
                 return;
-            }
+            }            
 
             // Calling this asynchronously as the StealFocusTask function can hang 
             IsStealingFocus = true;
@@ -955,6 +970,9 @@ namespace AstoundingApplications.AstoundingDock.Ui
         static bool StealFocusTask(IntPtr handle)
         {
             // NOTE: The Win32.AttachThreadInput function can hang
+            // See:
+
+            // The New Old Thing - I warned you: The dangers of attaching input queues            
             // http://blogs.msdn.com/b/oldnewthing/archive/2008/08/01/8795860.aspx
 
             uint foregroundId = Win32Window.GetWindowThreadProcessId(Win32Window.GetForegroundWindow());
@@ -992,64 +1010,7 @@ namespace AstoundingApplications.AstoundingDock.Ui
                 }
             }
              */
-        }
-
-        void HandleFullScreenRdpApps()
-        {
-            if (!_appbar.ReserveScreen)
-                return;
-
-            Log.DebugFormat("HandleFullScreenRdpApps");
-            IntPtr foregroundWindow = Win32Window.GetForegroundWindow();
-            RECT dimensions = Win32Window.GetWindowRect(foregroundWindow);
-            Rect foregroundRectangle = new Rect(
-                        new Point(dimensions.left, dimensions.top),
-                        new Point(dimensions.right, dimensions.bottom));
-
-            Rect appbarRectangle = new Rect(Left, Top, ActualWidth, ActualHeight);
-
-            IntPtr desktop = Win32Window.GetDesktopWindow();
-            IntPtr shell = Win32Window.GetShellWindow();
-            
-            //Win32Window.ChangeWindowZOrder(_appbar.Handle, HWND.NOTOPMOST);
-            Win32Window.EnumWindows((handle, lParam) =>
-            //Win32Window.EnumDesktopWindows((handle, lParam) =>
-            {
-                if (handle != desktop && handle != shell && handle != _appbar.Handle)
-                {                        
-                    string title = Win32Window.GetWindowTitle(handle);
-                    bool topmost = Win32Window.IsWindowTopMost(handle);
-
-                    RECT windowDimension = Win32Window.GetWindowRect(handle);
-                    WINDOWINFO info = Win32Window.GetWindowInfo(_appbar.Handle);
-
-                    Rect windowRectangle = new Rect(
-                        new Point(windowDimension.left, windowDimension.top),
-                        new Point(windowDimension.right, windowDimension.bottom));
-
-                    if (!String.IsNullOrWhiteSpace(title) && windowRectangle.Contains(appbarRectangle))
-                    {
-                        //var styles = Win32Window.TranslateWindowStyles(info.dwStyle);
-                        //var extendedStyles = Win32Window.TranslateExtendedWindowStyles(info.dwExStyle);
-
-                        //Log.DebugFormat("Window found {0}, TopMost {1}, Styles [{2}], Extended Styles [{3}], Rectangle {4}",
-                        //    title, topmost, String.Join(",", styles), String.Join(",", extendedStyles),
-                        //    String.Format("L: {0}, T: {1}, R: {2}, B: {3}", windowRectangle.Left, windowRectangle.Top, windowRectangle.Right, windowRectangle.Bottom));
-                         
-
-                        //Log.DebugFormat("Window found {0}, TopMost {1}, Rectangle {3}",
-                        //    title, topmost, String.Format("L: {0}, T: {1}, R: {2}, B: {3}", 
-                        //     windowRectangle.Left, windowRectangle.Top, windowRectangle.Right, 
-                        //    windowRectangle.Bottom));
-
-                        //Win32Window.SetForegroundWindow(handle);
-                        //bool result = Win32Window.BringWindowToTop(handle);
-                        //Log.DebugFormat("Tried to push the window {0} on top, result {1}", title, result);
-                    }
-                }
-                return true;
-            });
-        }
+        }        
 
         bool CanShow()
         {
@@ -1088,23 +1049,17 @@ namespace AstoundingApplications.AstoundingDock.Ui
         Position CalculateSlideOutPosition()
         {
             return CalculateSlideOutPosition(DockPosition);
-        }
+        }        
 
         Position CalculateSlideOutPosition(DockPosition dockPosition)
         {
             double windowSize = CalculateWindowWidth(IconRows);
-            var bounds = ActiveScreen.Bounds;
-            //var bounds = ActiveScreen.WorkingArea;
+            var bounds = GetActiveScreenBounds(dockPosition);
 
-            /*
-            int x;
-            int y;
-            WpfHelper.TransformToPixels(this, System.Windows.SystemParameters.WorkArea.X, System.Windows.SystemParameters.WorkArea.Y, out x, out y);
-            var bounds = new Rect(x, y, System.Windows.SystemParameters.WorkArea.Width,System.Windows.SystemParameters.WorkArea.Height);
-            Log.DebugFormat("CalculateSlieOut WPF bounds {0}", bounds);
-             */
+            Position position = new Position();           
 
-            Position position = new Position();
+            Log.DebugFormat("CalculateSlideOut WPF bounds {0}", bounds);
+
             switch (dockPosition.Selected)
             {
                 case DockEdge.Left:
@@ -1123,19 +1078,19 @@ namespace AstoundingApplications.AstoundingDock.Ui
                     position.Top = bounds.Top;
                     position.Left = bounds.Left;
                     position.Width = bounds.Width;
-                    position.Height = VerticallyDockedHeight;
+                    position.Height = GetVerticallyDockedHeight();
                     break;
                 case DockEdge.Bottom:
-                    position.Top = bounds.Bottom - VerticallyDockedHeight;
+                    position.Top = bounds.Bottom - GetVerticallyDockedHeight();
                     position.Left = bounds.Left;
                     position.Width = bounds.Width;
-                    position.Height = VerticallyDockedHeight;
+                    position.Height = GetVerticallyDockedHeight();
                     break;
             }
             position.Bottom = position.Top + position.Height;
             position.Right = position.Left + position.Width;
 
-            _appbar.CorrectPosition(ref position);
+            _appbar.CorrectPosition(ref position);            
 
             Log.DebugFormat("SlideOut position {0}", position);                
             return position;
@@ -1148,29 +1103,31 @@ namespace AstoundingApplications.AstoundingDock.Ui
 
         Position CalculateSlideInPosition(DockPosition dockPosition)
         {
+            var bounds = GetActiveScreenBounds(dockPosition);
+
             Position position = new Position();
             switch (dockPosition.Selected)
             {
                 case DockEdge.Left:
                     position.Top = this.Top;
-                    position.Left = ActiveScreen.Bounds.Left - this.ActualWidth;
+                    position.Left = bounds.Left - this.ActualWidth;
                     position.Width = this.ActualWidth;
                     position.Height = this.ActualHeight;
                     break;
                 case DockEdge.Right:
                     position.Top = this.Top;
-                    position.Left = ActiveScreen.Bounds.Right + this.ActualWidth;
+                    position.Left = bounds.Right + this.ActualWidth;
                     position.Width = this.ActualWidth;
                     position.Height = ActiveScreen.Bounds.Height;
                     break;
                 case DockEdge.Top:
-                    position.Top = ActiveScreen.Bounds.Top - this.ActualHeight;
+                    position.Top = bounds.Top - this.ActualHeight;
                     position.Left = this.Left;
                     position.Width = this.ActualHeight;
                     position.Height = this.ActualHeight;
                     break;
                 case DockEdge.Bottom:
-                    position.Top = ActiveScreen.Bounds.Bottom + this.ActualHeight;
+                    position.Top = bounds.Bottom + this.ActualHeight;
                     position.Left = this.Left;
                     position.Width = this.ActualWidth;
                     position.Height = this.ActualHeight;;
@@ -1225,7 +1182,7 @@ namespace AstoundingApplications.AstoundingDock.Ui
             // Normally Mouse.Directly over would tell you but the window is transparent so...
             int[] position = Win32Mouse.GetMousePosition();
             Rect bounds = new Rect(Left, Top, ActualWidth, ActualHeight);
-            return bounds.Contains(new Point(position[0], position[1]));              
+            return bounds.Contains(new System.Windows.Point(position[0], position[1]));              
         }
         
         double CalculateWindowWidth(int iconRows)
@@ -1275,6 +1232,43 @@ namespace AstoundingApplications.AstoundingDock.Ui
         double GetDifferenceBetween(double value1, double value2)
         {
             return Math.Abs(value1 - value2);
+        }
+
+        System.Drawing.Rectangle GetActiveScreenBounds(DockPosition dockPosition)
+        {
+            var workingArea = AdjustForWindows10DpiScaling(ActiveScreen.WorkingArea);
+            var bounds = AdjustForWindows10DpiScaling(ActiveScreen.Bounds);
+
+            //The working area of the screen is the bounds of the screen minus the 
+            //start bar. If reserve screen is enabled, the dock will adjust the 
+            //working area as well so we have to use the bounds
+
+            //However, if the reserve screen is disabled we can just use on the working area
+            return Configuration.ReserveScreen ? bounds : workingArea;
+        }
+
+        /// <summary>
+        /// https://dzimchuk.net/best-way-to-get-dpi-value-in-wpf/
+        /// </summary>
+        /// <returns></returns>
+        private System.Drawing.Rectangle AdjustForWindows10DpiScaling(Rectangle bounds)
+        {
+            var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
+            double dx = m.M11;
+            double dy = m.M22;
+
+            return new System.Drawing.Rectangle(
+                (int)(bounds.X / dx),
+                (int)(bounds.Y / dy),
+                (int)(bounds.Width / dx),
+                (int)(bounds.Height / dy));
+        }
+
+        int GetVerticallyDockedHeight()
+        {
+            int height = 40;
+            var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
+            return (int)Math.Round(height / m.M22);
         }
     }
 }

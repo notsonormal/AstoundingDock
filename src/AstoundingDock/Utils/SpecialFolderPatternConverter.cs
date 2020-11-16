@@ -5,6 +5,9 @@ using System.Text;
 
 namespace AstoundingApplications.AstoundingDock.Utils
 {
+    /// <summary>
+    /// This is used in the log4net.config file
+    /// </summary>
     public class SpecialFolderPatternConverter : log4net.Util.PatternConverter
     {
         override protected void Convert(System.IO.TextWriter writer, object state)

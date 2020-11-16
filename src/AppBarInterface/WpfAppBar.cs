@@ -62,7 +62,7 @@ namespace AstoundingApplications.AppBarInterface
             ReserveScreen = AppBarDefaultValues.ReserveScreen;
             Docked = new DockPosition(AppBarDefaultValues.Docked);
             ActiveScreen = AppBarDefaultValues.Screen;        
-        }        
+        }
 
         #region Properties
         public DockPosition Docked { get; private set; }
@@ -134,7 +134,7 @@ namespace AstoundingApplications.AppBarInterface
                     {
                         Action = AppBarNotificationAction.ErrorEvent,
                         Data = String.Format("Problem tring to register for raw input events, {0}", ex.Message),
-                    });                
+                    });
             }
 
             // Listen for window events.
@@ -225,7 +225,7 @@ namespace AstoundingApplications.AppBarInterface
             if (_toolbar == null)
                 return; 
 
-            _toolbar.SetPosition(ref _currentPosition, Docked);
+            _toolbar.SetPosition(ref _currentPosition, Docked);            
         }
 
         void SetMinimized()
@@ -271,7 +271,7 @@ namespace AstoundingApplications.AppBarInterface
 
         void OnToolbarEvent(object sender, AppBarEventArgs e)
         {
-            Debug.Print("OnToolbarEvent - Action: {0}, Data: {1}, ReverseScreen: {2}, Win32Window.IsFullScreen {3}", e.Action, e.Data, ReserveScreen, Win32Window.IsFullScreen());
+            Debug.Print("OnToolbarEvent - Action: {0}, Data: {1}, ReserveScreen: {2}, Win32Window.IsFullScreen {3}", e.Action, e.Data, ReserveScreen, Win32Window.IsFullScreen());
 
             switch (e.Action)
             {
@@ -356,7 +356,7 @@ namespace AstoundingApplications.AppBarInterface
             }
 
             return false;
-        }
+        }        
 
         /*
         void CheckForFullScreenApps()
@@ -438,7 +438,7 @@ namespace AstoundingApplications.AppBarInterface
             /*
             if (ReserveScreen)
             {
-                // TODO: Check if a 'FullScreen' app is overing the active window, if so,
+                // TODO: Check if a 'FullScreen' app is covering the active window, if so,
                 // push down to bottom.
                 CheckForFullScreenApps();
                 return;
