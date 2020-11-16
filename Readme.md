@@ -5,8 +5,10 @@ AstoundingDock is an application launcher / dock for Windows XP and upwards. A d
 
 Built using .NET Framework 4, using Visual Studio 2010. 
 
-![Image of Astound Dock](https://github.com/notsonormal/AstoundingDock/blob/master/images/Horizontal%20mode.jpg)
+![Image of Astounding Dock](https://github.com/notsonormal/AstoundingDock/blob/master/images/Horizontal%20mode.jpg)
+
+See [wiki page](https://github.com/notsonormal/AstoundingDock/wiki) for more details.
 
 [Download from Softpedia](https://www.softpedia.com/get/System/Launchers-Shutdown-Tools/Astounding-Dock.shtml)
 
-See [wiki page](https://github.com/notsonormal/AstoundingDock/wiki) for more details.
+
