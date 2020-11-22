@@ -248,10 +248,10 @@ namespace AstoundingApplications.AstoundingDock.Utils
             data.Sections["General"].AddKey("IconRows", "3");
             data.Sections["General"].AddKey("ActiveScreen", Screen.PrimaryScreen.DeviceName.CleanString());
             data.Sections["General"].AddKey("DockPosition", DockEdge.Right.ToString());
-            data.Sections["General"].AddKey("AutoHide", Boolean.TrueString);
+            data.Sections["General"].AddKey("AutoHide", Boolean.FalseString);
             data.Sections["General"].AddKey("AutoHideDelay", "1000");
             data.Sections["General"].AddKey("PopupDelay", "1000");
-            data.Sections["General"].AddKey("ReserveScreen", Boolean.TrueString);
+            data.Sections["General"].AddKey("ReserveScreen", Boolean.FalseString);
             data.Sections["General"].AddKey("ApplicationFilter", ApplicationFilter.All.ToString());
             data.Sections["General"].AddKey("CurrentTheme", DefaultTheme);
             data.Sections["General"].AddKey("ToggleRunOnStartup", Boolean.FalseString);

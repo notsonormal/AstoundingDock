@@ -269,6 +269,12 @@ namespace AstoundingApplications.AppBarInterface
 
                 string[] split = deviceName.Split('#');
 
+                if (split.Length < 3)
+                {
+                    Debug.WriteLine("Unexpected device name, {0}", deviceName);                       
+                    return info;
+                }
+
                 string id_01 = split[0];    // ACPI (Class code)
                 string id_02 = split[1];    // PNP0303 (SubClass code)
                 string id_03 = split[2];    // 3&13c0b0c5&0 (Protocol code)
