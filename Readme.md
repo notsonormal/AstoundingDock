@@ -9,6 +9,10 @@ Built using .NET Framework 4, using Visual Studio 2010.
 
 See [wiki page](https://github.com/notsonormal/AstoundingDock/wiki) for more details.
 
-[Download from Softpedia](https://www.softpedia.com/get/System/Launchers-Shutdown-Tools/Astounding-Dock.shtml)
+[Get Latest Version From Github](https://github.com/notsonormal/AstoundingDock/blob/master/src/AstoundingDock/Setup/AstoundingDock%201.2.0.0.exe)
+
+[Download from Softpedia](https://www.softpedia.com/get/System/Launchers-Shutdown-Tools/Astounding-Dock.shtml) (out of date)
+
+[Download from Cnet.com](https://download.cnet.com/Astounding-Dock/3000-2344_4-75810702.html) (out of date)
 
 
